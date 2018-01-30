@@ -2,18 +2,18 @@ import numpy as np
 from collections import Counter
 
 class KNN(object):
-    
+
     """ a kNN classifier with L2 distance """
-    
+
     def __init__(self):
         self.X_train = None
         self.y_train = None
-        
+
     def train(self, X, y):
         """
-        Train the classifier. For k-nearest neighbors this is just 
+        Train the classifier. For k-nearest neighbors this is just
         memorizing the training data.
-        
+
         Inputs:
         - X: A numpy array of shape (num_train, D) containing the training data
             consisting of num_train samples each of dimension D.
@@ -24,19 +24,19 @@ class KNN(object):
         # TODO:                                                             #
         # Train the classifier. Save the training data as X_train           #
         # and y_train                                                       #
-        #####################################################################   
+        #####################################################################
         # Put your code here
         pass
         #####################################################################
         #                       END OF YOUR CODE                            #
         #####################################################################
-    
-    
+
+
     def compute_distances_two_loops(self, X):
-    
+
         """
         Compute the distance between each test point in X and each training point
-        in self.X_train using a nested loop over both the training data and the 
+        in self.X_train using a nested loop over both the training data and the
         test data.
 
         Inputs:
@@ -52,21 +52,21 @@ class KNN(object):
         dists = np.zeros((num_test, num_train))
         for i in range(num_test):
             for j in range(num_train):
-          
+
                 #####################################################################
-                # TODO:                                                             #                          
+                # TODO:                                                             #
                 # Compute the l2 distance between the ith test point and the jth    #
                 # training point, and store the result in dists[i, j]. You should   #
                 # not use a loop over dimension.                                    #
                 #####################################################################
                 # Put your code here
                 #####################################################################
-                #                       END OF YOUR CODE  
+                #                       END OF YOUR CODE
                 pass
                 #####################################################################
         return dists
 
-        
+
     def compute_distances_one_loop(self, X):
         """
         Compute the distance between each test point in X and each training point
@@ -82,15 +82,15 @@ class KNN(object):
             # TODO:                                                               #
             # Compute the l2 distance between the ith test point and all training #
             # points, and store the result in dists[i, :].                        #
-            #######################################################################  
-            # 
+            #######################################################################
+            #
             # Put your code here
             pass
             #
             #######################################################################
             #                         END OF YOUR CODE                            #
             #######################################################################
-        
+
         return dists
 
     def compute_distances_no_loops(self, X):
@@ -124,35 +124,35 @@ class KNN(object):
         #                         END OF YOUR CODE                              #
         #########################################################################
         return dists
-    
+
     def predict(self, X, which_ver=0, k=1):
         """
         Predict labels for test data using this classifier.
-        
+
         Inputs:
-        - X: A numpy array of shape (num_test, D) containing test data consisting 
+        - X: A numpy array of shape (num_test, D) containing test data consisting
             of num_test samples each of dimension D.
         - k: The number of nearest neighbors that vote for the predicted labels.
-        
+
         Returns:
-        - y: A numpy array of shape (num_test,) containing predicted labels for 
+        - y: A numpy array of shape (num_test,) containing predicted labels for
             the test data, where y[i] is the predicted label for the test point X[i].
         """
-        
+
         if which_ver == 0:
             dists = self.compute_distances_no_loops(X)    # get the distance matrix (use the fully vectorized version)
         elif which_ver == 1:
             dists = self.compute_distances_one_loop(X)    # get the distance matrix (use the fully vectorized version)
         elif which_ver == 2:
             dists = self.compute_distances_two_loops(X)    # get the distance matrix (use the fully vectorized version)
- 
+
         num_test = len(X)                             # number of test samples
         y_pred = np.zeros(num_test, dtype = 'int')    # use this to store result
-        
+
         for i in range(num_test):
- 
+
             closest_y = []     # a list of length k storing the labels of the k nearest neighbors to the ith test point.
-          
+
             #########################################################################
             # TODO:                                                                 #
             # Use the distance matrix to find the k nearest neighbors of the ith    #
@@ -175,7 +175,7 @@ class KNN(object):
             # Put your code here
             #
             #########################################################################
-            #                           END OF YOUR CODE                            # 
+            #                           END OF YOUR CODE                            #
             #########################################################################
-        
+
         return y_pred
