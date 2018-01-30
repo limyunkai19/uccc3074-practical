@@ -131,9 +131,8 @@ class KNN(object):
         s1 = np.sum(X**2, axis=1)
         s2 = np.sum(self.X_train**2, axis=1)
         s1s2 = s1.reshape(s1.size, 1) + s2.reshape(1, s2.size)
-        s3 = np.dot(X,self.X_train.transpose())
+        s3 = np.dot(X, self.X_train.transpose())
 
-        print((s1s2-2*s3).shape)
         dists = (s1s2-2*s3)**0.5
         #########################################################################
         #                         END OF YOUR CODE                              #
