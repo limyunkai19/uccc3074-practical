@@ -26,7 +26,10 @@ class KNN(object):
         # and y_train                                                       #
         #####################################################################
         # Put your code here
-        pass
+
+        self.X_train = X
+        self.y_train = y
+
         #####################################################################
         #                       END OF YOUR CODE                            #
         #####################################################################
@@ -60,9 +63,11 @@ class KNN(object):
                 # not use a loop over dimension.                                    #
                 #####################################################################
                 # Put your code here
+
+                dists[i, j] = np.sum((X[i] - self.X_train[j])**2)**0.5
+
                 #####################################################################
-                #                       END OF YOUR CODE
-                pass
+                #                       END OF YOUR CODE                            #
                 #####################################################################
         return dists
 
@@ -85,8 +90,10 @@ class KNN(object):
             #######################################################################
             #
             # Put your code here
-            pass
             #
+
+            dists[i] = np.sqrt(np.sum((np.square(self.X_train - X[i])), axis=1))
+
             #######################################################################
             #                         END OF YOUR CODE                            #
             #######################################################################
@@ -120,6 +127,14 @@ class KNN(object):
         #  Step 4: s3   = get the dot product between X and X_train (matrix of size 500 x 500)
         #  Step 5: result = simple formula to combine s1s2 and s3
         #
+
+        s1 = np.sum(X**2, axis=1)
+        s2 = np.sum(self.X_train**2, axis=1)
+        s1s2 = s1.reshape(s1.size, 1) + s2.reshape(1, s2.size)
+        s3 = np.dot(X,self.X_train.transpose())
+
+        print((s1s2-2*s3).shape)
+        dists = (s1s2-2*s3)**0.5
         #########################################################################
         #                         END OF YOUR CODE                              #
         #########################################################################
@@ -163,6 +178,9 @@ class KNN(object):
             #
             # Put your code here
             #
+
+            closest_y = np.take(self.y_train, np.argsort(dists[i]))
+
             #########################################################################
             # TODO:                                                                 #
             # Now that you have found the labels of the k nearest neighbors, you    #
@@ -174,6 +192,9 @@ class KNN(object):
             #
             # Put your code here
             #
+
+            y_pred[i] = np.argmax(np.bincount(closest_y[:k]))
+
             #########################################################################
             #                           END OF YOUR CODE                            #
             #########################################################################
