@@ -22,7 +22,7 @@ def svm_loss_naive(W, X, y, reg):
         - gradient with respect to weights W; an array of same shape as W
     
     """   
-    loss = inf                 #
+    loss = 0                   #
     num_classes = W.shape[1]   # number of classes
     num_train = X.shape[0]     # number of training samples
     
@@ -31,16 +31,21 @@ def svm_loss_naive(W, X, y, reg):
     # class SVM
     ###########################################################
     for i in range(num_train):
-
         # compute the scores
-        pass
-            
+        score_i = np.dot(X[i], W)
+        loss_i = 0
+
         for j in range(num_classes):
-            
             # compute the loss incurred by class j
-            pass
+            if j == y[i]:
+                continue
+            loss_i += max(0, score_i[j] - score_i[y[i]] + 1)
+            
+        
+        loss += loss_i
             
     # add the regularization term
+    loss = loss/num_train + reg*np.sum(W**2)
        
     ###########################################################
     # End of code
@@ -67,7 +72,7 @@ def svm_loss_vectorized(W, X, y, reg):
     #                             END OF YOUR CODE                              #
     #############################################################################
 
-    return loss
+#     return loss
 
 # -----------------------------------------------------------------------------------
 # Function to compute the gradient (naive version)
