@@ -11,7 +11,7 @@ class LinearClassifier(object):
 
     def __init__(self):
         self.W = None
-                
+
     def train(self, X, y, learning_rate=1e-3, reg=1e-5, num_epochs=5, batch_size=200, max_iter = -1, vectorized = True, verbose=False):
         """
         Train this linear classifier using stochastic gradient descent.
@@ -32,7 +32,7 @@ class LinearClassifier(object):
         """
         num_train, dim = X.shape
         num_classes = np.max(y) + 1 # assume y takes values 0...K-1 where K is number of classes
-        
+
         # Initialization
         if self.W is None:
             self.W = 0.001 * np.random.randn(dim, num_classes)
@@ -40,13 +40,13 @@ class LinearClassifier(object):
         loss_history = []                                           # to store the loss value over all iterations (this will be used to plot figures later)
         iters_per_epoch = int(math.ceil(num_train/batch_size))      # compute number of iterations over each epoch
         num_iter = 0                                                # keeps track of number of batch iterations
-        
+
         # Train for num_epochs time. When training completes one epoch, it has seen all the samples in the whole dataset once.
         for epoch in range(num_epochs):
-        
+
             X_batch = None
             y_batch = None
-                       
+
             #########################################################################
             # TODO:                                                                 #
             # Create a shuffled index. The data will be provided following this     #
@@ -58,7 +58,7 @@ class LinearClassifier(object):
             #########################################################################
 
             for it, idx in enumerate(range(0, num_train, batch_size)):
-                
+
                 #########################################################################
                 # TODO:                                                                 #
                 # Get the current batch                                                 #
@@ -74,13 +74,13 @@ class LinearClassifier(object):
                 # Evaluate loss and gradient
                 loss, grad = self.loss(X_batch, y_batch, reg, vectorized)
                 loss_history.append(loss)
-                
+
                 #########################################################################
                 # TODO:                                                                 #
                 # Perform parameter update                                              #
                 #########################################################################
-                
-                self.W = self.W - learning_rate*grad                                                 
+
+                self.W = self.W - learning_rate*grad
                 #########################################################################
                 #                  END OF YOUR CODE                                     #
                 #########################################################################
@@ -93,13 +93,13 @@ class LinearClassifier(object):
                 # stop if reach maximum number of batch iteration
                 if max_iter > 0 and num_iter >= max_iter:
                     break
-                    
+
         if verbose:
             print('Total number of iterations: {:d}'.format(num_iter))
-        
+
         return loss_history
 
-        
+
     def predict(self, X):
         """
         Use the trained weights of this linear classifier to predict labels for
@@ -119,18 +119,18 @@ class LinearClassifier(object):
         # TODO:                                                                   #
         # Implement this method. Store the predicted labels in y_pred.            #
         ###########################################################################
-        
+
         y_pred = np.argmax(np.dot(X, self.W), axis=1)
-        
+
         ###########################################################################
         #                           END OF YOUR CODE                              #
         ###########################################################################
         return y_pred
-  
+
     def loss(self, X_batch, y_batch, reg, vectorized = True):
 
         """
-        Compute the loss function and its derivative. 
+        Compute the loss function and its derivative.
         Subclasses will override this.
 
         Inputs:
@@ -152,13 +152,12 @@ class LinearSVM(LinearClassifier):
   """ A subclass that uses the Multiclass SVM loss function """
 
   def loss(self, X_batch, y_batch, reg, vectorized = True):
-  
+
     if vectorized:
         loss        = svm_loss_vectorized (self.W, X_batch, y_batch, reg)
         gradient    = svm_gradient_vectorized (self.W, X_batch, y_batch, reg)
     else:
         loss        = svm_loss_naive(self.W, X_batch, y_batch, reg)
         gradient    = svm_gradient_naive (self.W, X_batch, y_batch, reg)
-    
+
     return loss, gradient
-    

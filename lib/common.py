@@ -15,5 +15,5 @@ def show_thumbnails (X, y, classes, samples_per_class = 10):
             plt.axis('off')
             if i == 0:
                 plt.title(cls)
-                
+
     plt.show()
