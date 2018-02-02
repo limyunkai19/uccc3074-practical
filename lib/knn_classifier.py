@@ -139,7 +139,38 @@ class KNN(object):
         #########################################################################
         return dists
 
-    def predict(self, X, which_ver=0, k=1):
+    def get_closest_y(self, X, which_ver=0):
+        """
+        Get the label of all nearest neighbour
+
+        Inputs:
+        - X: A numpy array of shape (num_test, D) containing test data consisting
+            of num_test samples each of dimension D.
+
+        Returns:
+        - closest_y: A numpy array of shape (num_test, num_train) where closest_y[i, j]
+            is the y label of j-th closest neighbour of i-th test point
+        """
+        if which_ver == 0:
+            dists = self.compute_distances_no_loops(X)
+        elif which_ver == 1:
+            dists = self.compute_distances_one_loop(X)
+        elif which_ver == 2:
+            dists = self.compute_distances_two_loops(X)
+
+
+        #########################################################################
+        # TODO:                                                                 #
+        # Use the distance matrix to find the k nearest neighbors of the ith    #
+        # testing point, and use self.y_train to find the labels of these       #
+        # neighbors. Store these labels in closest_y.                           #
+        # Hint: Look up the function numpy.argsort                              #
+        #########################################################################
+
+        closest_y = np.take(self.y_train, np.argsort(dists, axis=1))
+        return closest_y
+
+    def predict(self, X, which_ver=0, k=1, closest_y=None):
         """
         Predict labels for test data using this classifier.
 
@@ -147,39 +178,22 @@ class KNN(object):
         - X: A numpy array of shape (num_test, D) containing test data consisting
             of num_test samples each of dimension D.
         - k: The number of nearest neighbors that vote for the predicted labels.
+        - closest_y (optional): A numpy array of shape (num_test, num_train) where
+            closest_y[i, j] is the y label of j-th closest neighbour of i-th test point.
+            If present, the dist are not recomputed.
 
         Returns:
         - y: A numpy array of shape (num_test,) containing predicted labels for
             the test data, where y[i] is the predicted label for the test point X[i].
         """
 
-        if which_ver == 0:
-            dists = self.compute_distances_no_loops(X)    # get the distance matrix (use the fully vectorized version)
-        elif which_ver == 1:
-            dists = self.compute_distances_one_loop(X)    # get the distance matrix (use the fully vectorized version)
-        elif which_ver == 2:
-            dists = self.compute_distances_two_loops(X)    # get the distance matrix (use the fully vectorized version)
+        if closest_y is None:
+            closest_y = self.get_closest_y(X, which_ver=which_ver)
 
         num_test = len(X)                             # number of test samples
         y_pred = np.zeros(num_test, dtype = 'int')    # use this to store result
 
         for i in range(num_test):
-
-            closest_y = []     # a list of length k storing the labels of the k nearest neighbors to the ith test point.
-
-            #########################################################################
-            # TODO:                                                                 #
-            # Use the distance matrix to find the k nearest neighbors of the ith    #
-            # testing point, and use self.y_train to find the labels of these       #
-            # neighbors. Store these labels in closest_y.                           #
-            # Hint: Look up the function numpy.argsort                              #
-            #########################################################################
-            #
-            # Put your code here
-            #
-
-            closest_y = np.take(self.y_train, np.argsort(dists[i]))
-
             #########################################################################
             # TODO:                                                                 #
             # Now that you have found the labels of the k nearest neighbors, you    #
@@ -188,11 +202,8 @@ class KNN(object):
             # same frequency) by choosing the smaller label.                        #
             # Hint: Look up the function numpy.bincount and numpy.argmax            #
             #########################################################################
-            #
-            # Put your code here
-            #
 
-            y_pred[i] = np.argmax(np.bincount(closest_y[:k]))
+            y_pred[i] = np.argmax(np.bincount(closest_y[i][:k]))
 
             #########################################################################
             #                           END OF YOUR CODE                            #
