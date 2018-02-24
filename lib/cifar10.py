@@ -62,7 +62,7 @@ def load_data(path, data_format = 'channels_last'):
     return X_train, y_train, X_test, y_test
 
 
-def get_CIFAR10_data(path, num_training=49000, num_validation=1000, num_test=1000, num_dev=500, b_preprocess = True):
+def get_CIFAR10_data(path, num_training=49000, num_validation=1000, num_test=1000, num_dev=500, b_center = True, b_add_bias = False):
     """
     1. Load the CIFAR-10 dataset from disk (size = [# samples, 32, 32, 3])
     2. Extract the training set, validation set, testing set and development set).
@@ -86,6 +86,10 @@ def get_CIFAR10_data(path, num_training=49000, num_validation=1000, num_test=100
     # Load the raw CIFAR-10 data
     X_train, y_train, X_test, y_test = load_data(path)
 
+    # Convert uint8 to double type
+    X_train = X_train.astype('double')
+    X_test  = X_test.astype('double')
+
     # subsample the data
     mask = list(range(num_training, num_training + num_validation))
     X_val = X_train[mask]
@@ -99,28 +103,37 @@ def get_CIFAR10_data(path, num_training=49000, num_validation=1000, num_test=100
     X_test = X_test[mask]
     y_test = y_test[mask]
 
-    mask = np.random.choice(num_training, num_dev, replace=False)
-    X_dev = X_train[mask]
-    y_dev = y_train[mask]
-
-    # Preprocessing: reshape the image data into rows
     X_train = np.reshape(X_train, (X_train.shape[0], -1))
     X_val = np.reshape(X_val, (X_val.shape[0], -1))
     X_test = np.reshape(X_test, (X_test.shape[0], -1))
-    X_dev = np.reshape(X_dev, (X_dev.shape[0], -1))
 
-    if b_preprocess:
+    if b_center:
+
         # Normalize the data: subtract the mean image
         mean_image = np.mean(X_train, axis = 0)
         X_train -= mean_image
         X_val -= mean_image
         X_test -= mean_image
-        X_dev -= mean_image
 
+    if b_add_bias:
         # add bias dimension (last column)
         X_train = np.hstack([X_train, np.ones((X_train.shape[0], 1))])
         X_val = np.hstack([X_val, np.ones((X_val.shape[0], 1))])
         X_test = np.hstack([X_test, np.ones((X_test.shape[0], 1))])
-        X_dev = np.hstack([X_dev, np.ones((X_dev.shape[0], 1))])
 
-    return X_train, y_train, X_val, y_val, X_test, y_test, X_dev, y_dev
+
+    if num_dev > 0:
+        mask = np.random.choice(num_training, num_dev, replace=False)
+        X_dev = X_train[mask]
+        y_dev = y_train[mask]
+
+        if b_add_bias:
+            X_dev = np.reshape(X_dev, (X_dev.shape[0], -1))
+
+        if b_preprocess:
+            X_dev -= mean_image
+            X_dev = np.hstack([X_dev, np.ones((X_dev.shape[0], 1))])
+
+        return X_train, y_train, X_val, y_val, X_test, y_test, X_dev, y_dev
+
+    return X_train, y_train, X_val, y_val, X_test, y_test
