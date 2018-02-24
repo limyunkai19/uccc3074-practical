@@ -76,7 +76,9 @@ class TwoLayerNet(object):
         # Store the result in the scores variable, which should be an array of      #
         # shape (N, C).                                                             #
         #############################################################################
-        pass
+        z1 = X.dot(W1) + b1
+        a1 = np.maximum(z1,0)
+        scores = a1.dot(W2) + b2
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
@@ -95,7 +97,8 @@ class TwoLayerNet(object):
         # in the variable loss, which should be a scalar. Use the Softmax           #
         # classifier loss.                                                          #
         #############################################################################       
-        pass
+        probs = np.exp(scores) / np.sum(np.exp(scores),axis=1,keepdims=True)
+        loss = np.mean(-np.log(probs[range(N),y])) + reg*(np.sum(W1**2) + np.sum(W2**2))
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
@@ -189,7 +192,10 @@ class TwoLayerNet(object):
                 # using stochastic gradient descent. You'll need to use the gradients   #
                 # stored in the grads dictionary defined above.                         #
                 #########################################################################               
-                pass
+                self.params['W1'] -= learning_rate * grads['W1']
+                self.params['b1'] -= learning_rate * grads['b1']
+                self.params['W2'] -= learning_rate * grads['W2']
+                self.params['b2'] -= learning_rate * grads['b2']
                 #########################################################################
                 #                             END OF YOUR CODE                          #
                 #########################################################################                
@@ -205,7 +211,7 @@ class TwoLayerNet(object):
                     # Multiply 'learning_rate' by 'learning_rate_decay' to refine the       #
                     # learning rate                                                         #
                     #########################################################################
-                    pass
+                    learning_rate = learning_rate * learning_rate_decay
                     #########################################################################
                     #                             END OF YOUR CODE                          #
                     #########################################################################
@@ -220,7 +226,12 @@ class TwoLayerNet(object):
                     # validation set. Then, append the score to 'train_acc_history' and     #
                     # 'val_acc_history'                                                     #
                     #########################################################################
-                    pass
+                    y_pred = self.predict(X)
+                    train_acc = np.mean(y_pred == y)
+                    train_acc_history.append(train_acc)
+                    y_pred = self.predict(X_val)
+                    val_acc = np.mean(y_pred == y_val)
+                    val_acc_history.append(val_acc)
                     #########################################################################
                     #                             END OF YOUR CODE                          #
                     #########################################################################
@@ -266,7 +277,19 @@ class TwoLayerNet(object):
         # TODO (Exercise 3):                                                      #
         # Implement this function; ep_it should be VERY simple!                   #
         ###########################################################################
-        pass
+        # Unpack variables from the params dictionary
+        W1, b1 = self.params['W1'], self.params['b1']
+        W2, b2 = self.params['W2'], self.params['b2']
+        N, D = X.shape
+
+        # Compute the forward pass
+        scores = None
+
+        z1 = X.dot(W1) + b1
+        a1 = np.maximum(z1,0)
+        scores = a1.dot(W2) + b2
+        
+        y_pred = np.argmax(scores,axis=1)
         ###########################################################################
         #                              END OF YOUR CODE                           #
         ###########################################################################
